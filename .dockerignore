@@ -1,0 +1,6 @@
+*.git*
+*.md
+*test*
+Dockerfile
+node_modules
+project_files
