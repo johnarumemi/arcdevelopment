@@ -8,6 +8,8 @@ import Tab from '@material-ui/core/Tab';
 import Button from '@material-ui/core/Button';
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
+import useMediaQuery from '@material-ui/core/useMediaQuery';
+import { useTheme } from "@material-ui/core/styles";
 
 import { Link } from 'react-router-dom';
 import logo from '../../assets/logo.svg'
@@ -36,11 +38,23 @@ const useStyles = makeStyles(theme => ({
     toolbarMargin: {
         boxSizing: "content-box",
         ...theme.mixins.toolbar, // minHeight of toolbar is extracted here, + media queries
-        marginBottom: '3rem'
+        marginBottom: '3rem',
+        [theme.breakpoints.down('md')]: {
+            marginBottom: '2rem'
+        },
+        [theme.breakpoints.down('xs')]: {
+            marginBottom: '1rem'
+        }
     },
 
     logo: {
-        height: '7rem'
+        height: '7rem',
+        [theme.breakpoints.down('md')]: { // <= md
+            height: '6rem'
+        },
+        [theme.breakpoints.down('xs')]: { // <= xs
+            height: '4rem'
+        }
     },
 
     logoContainer: {
@@ -100,6 +114,10 @@ export default function Header (props){
     const menu_urls = useRef({});
 
     const classes = useStyles();
+
+    const theme = useTheme();
+
+    const matches = useMediaQuery(theme.breakpoints.down('md')) // screen_width <= md ? true : false
 
     const [value, setValue] = useState(0);
 
@@ -171,6 +189,85 @@ export default function Header (props){
 
     }, [value, menuOptions, selectedIndex])
 
+    const tabs = (
+        <>
+            <Tabs
+                value={value}
+                onChange={handleChange}
+                className={classes.tabContainer}
+                indicatorColor='primary'
+            >
+                <Tab
+                    label='Home'
+                    className={classes.tab}
+                    component={Link}
+                    to='/'
+                />
+                <Tab
+                    aria-owns={anchorEl ? "simple-menu" : undefined}
+                    aria-haspopup={anchorEl ? "true" : "false"}
+                    label='Services'
+                    className={classes.tab}
+                    component={Link}
+                    onMouseOver={ event => handleClick(event) }
+                    to='/services'
+                />
+                <Tab
+                    label='The Revolution'
+                    className={classes.tab}
+                    component={Link}
+                    to='/revolution'
+                />
+                <Tab
+                    label='About Us'
+                    className={classes.tab}
+                    component={Link}
+                    to='/about'
+                />
+                <Tab
+                    label='Contact Us'
+                    className={classes.tab}
+                    component={Link}
+                    to='/contact'
+                />
+            </Tabs>
+
+            <Button
+                variant='contained'
+                color='secondary'
+                className={classes.button}
+            >
+                Free Estimate
+            </Button>
+
+            <Menu
+                id='simple-menu'
+                anchorEl={anchorEl}
+                open={open}
+                onClose={handleClose}
+                MenuListProps={ {onMouseLeave: handleClose} }
+                elevation={0}
+                classes={{
+                    paper: classes.menu
+                }}
+            >{
+                // on first DOM drawing menuOptions is empty, hence using menuOptions &&
+                menuOptions && menuOptions.map(option => (
+                    <MenuItem
+                        key={option.id}
+                        onClick={ e => handleMenuItemClick(e, option.id) }
+                        selected={ option.id === selectedIndex && value === 1} // receives selected styling
+                        component={Link}
+                        to={option.link}
+                        classes={ {root: classes.menuItem} }
+                    >
+                        {option.name}
+                    </MenuItem>
+                ))
+            }
+            </Menu>
+        </>
+    )
     return (
         <>
             <ElevationScroll>
@@ -187,81 +284,9 @@ export default function Header (props){
                         >
                             <img src={logo} alt='Company Logo' className={classes.logo}/>
                         </Button>
-                        <Tabs
-                            value={value}
-                            onChange={handleChange}
-                            className={classes.tabContainer}
-                            indicatorColor='primary'
-                        >
-                            <Tab
-                                label='Home'
-                                className={classes.tab}
-                                component={Link}
-                                to='/'
-                            />
-                            <Tab
-                                aria-owns={anchorEl ? "simple-menu" : undefined}
-                                aria-haspopup={anchorEl ? "true" : "false"}
-                                label='Services'
-                                className={classes.tab}
-                                component={Link}
-                                onMouseOver={ event => handleClick(event) }
-                                to='/services'
-                            />
-                            <Tab
-                                label='The Revolution'
-                                className={classes.tab}
-                                component={Link}
-                                to='/revolution'
-                            />
-                            <Tab
-                                label='About Us'
-                                className={classes.tab}
-                                component={Link}
-                                to='/about'
-                            />
-                            <Tab
-                                label='Contact Us'
-                                className={classes.tab}
-                                component={Link}
-                                to='/contact'
-                            />
-                        </Tabs>
 
-                        <Button
-                            variant='contained'
-                            color='secondary'
-                            className={classes.button}
-                        >
-                            Free Estimate
-                        </Button>
-                        
-                        <Menu
-                            id='simple-menu'
-                            anchorEl={anchorEl}
-                            open={open}
-                            onClose={handleClose}
-                            MenuListProps={ {onMouseLeave: handleClose} }
-                            elevation={0}
-                            classes={{
-                                paper: classes.menu
-                            }}
-                        >{
-                            // on first DOM drawing menuOptions is empty, hence using menuOptions &&
-                            menuOptions && menuOptions.map(option => (
-                                <MenuItem
-                                    key={option.id}
-                                    onClick={ e => handleMenuItemClick(e, option.id) }
-                                    selected={ option.id === selectedIndex && value === 1} // receives selected styling
-                                    component={Link}
-                                    to={option.link}
-                                    classes={ {root: classes.menuItem} }
-                                >
-                                    {option.name}
-                                </MenuItem>
-                                ))
-                        }
-                        </Menu>
+                        {/* if screen_width <= md render drawer else render full tabs*/}
+                        { matches ? null :  tabs }
 
                     </Toolbar>
                 </AppBar>
