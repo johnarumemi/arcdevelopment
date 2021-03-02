@@ -49,10 +49,8 @@ export default function Header (props){
     const matches = useMediaQuery(theme.breakpoints.down('md')) // screen_width <= md ? true : false
 
     const [openDrawer, setOpenDrawer] = useState(false);
-    const [value, setValue] = useState(0);
     const [anchorEl, setAnchorEl] = useState(null);     // element that Menu is anchored to
     const [openMenu, setOpenMenu] = useState(false);            // visibility of Menu
-    const [selectedIndex, setSelectedIndex] = useState(0); // selected Services Menu Options
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
     const routes = [
@@ -84,21 +82,21 @@ export default function Header (props){
         setOpenMenu(true);
     }
 
-    const handleClose = (event) => {
+    const handleClose = () => {
         // Close Menu
         setAnchorEl(null);
         setOpenMenu(false);
     }
 
     const handleChange = (event, newValue) => {
-        setValue(newValue)
+        props.setValue(newValue)
     }
 
     const handleMenuItemClick = (event, menuIndex) => {
         setAnchorEl(null);      // remove element Menu is anchored to
         setOpenMenu(false)      // close the Menu
-        setValue(1)             // set Portfolio tab as been selected
-        setSelectedIndex(menuIndex)  // store the index of the selected MenuItem
+        props.setValue(1)             // set Portfolio tab as been selected
+        props.setSelectedIndex(menuIndex)  // store the index of the selected MenuItem
     }
 
     useEffect( () => {
@@ -107,21 +105,21 @@ export default function Header (props){
             if (route.link === window.location.pathname){
                 // if we are in current path ensure that value is set to correct active tab
                 // all menuOptions have an activeIndex of 1
-                if (value !== route.activeIndex){
-                    setValue(route.activeIndex);
+                if (props.value !== route.activeIndex){
+                    props.setValue(route.activeIndex);
                     // if we are in a menuOption, ensure correct selectedIndex is set (selectedIndex is not undefined)
-                    if (route.selectedIndex && route.selectedIndex !== selectedIndex){
-                        setSelectedIndex(route.selectedIndex)
+                    if (route.selectedIndex && route.selectedIndex !== props.selectedIndex){
+                        props.setSelectedIndex(route.selectedIndex)
                     }
                 }
             }
         })
-    }, [value, selectedIndex, menuOptions, routes])
+    }, [props.value, props.selectedIndex, menuOptions, routes, props])
 
     const tabs = (
         <>
             <Tabs
-                value={value}
+                value={props.value}
                 onChange={handleChange}
                 className={classes.tabContainer}
                 indicatorColor='primary'
@@ -148,7 +146,7 @@ export default function Header (props){
                 className={classes.button}
                 component={Link}
                 to='/estimate'
-                onClick={ () => setValue(false) }
+                onClick={ () => props.setValue(false) }
             >
                 Free Estimate
             </Button>
@@ -170,7 +168,7 @@ export default function Header (props){
                     <MenuItem
                         key={`${route}${route.selectedIndex}`}
                         onClick={ e => handleMenuItemClick(e, route.selectedIndex) }
-                        selected={ route.selectedIndex === selectedIndex && value === route.activeIndex} // receives selected styling
+                        selected={ route.selectedIndex === props.selectedIndex && props.value === route.activeIndex} // receives selected styling
                         component={Link}
                         to={route.link}
                         classes={ {root: classes.menuItem} }
@@ -204,9 +202,9 @@ export default function Header (props){
                             divider
                             component={Link}
                             to={route.link}
-                            selected={value === route.activeIndex}
+                            selected={props.value === route.activeIndex}
                             classes={{selected: classes.drawerItemSelected}}
-                            onClick={ () => { setOpenDrawer(false); setValue(route.activeIndex);} }
+                            onClick={ () => { setOpenDrawer(false); props.setValue(route.activeIndex);} }
                         >
                             <ListItemText
                                 className={classes.drawerItem}
@@ -227,8 +225,8 @@ export default function Header (props){
                         }
                         component={Link}
                         to='/estimate'
-                        selected={ value === false }
-                        onClick={ () => {setOpenDrawer(false);  setValue(false)} }
+                        selected={ props.value === false }
+                        onClick={ () => {setOpenDrawer(false);  props.setValue(false)} }
                     >
                         <ListItemText
                             className={classes.drawerItem}
@@ -256,7 +254,7 @@ export default function Header (props){
                         <Button // Turn Logo into a button
                             disableRipple disableTouchRipple
                             className={classes.logoContainer}
-                            onClick={ () => setValue(0)}
+                            onClick={ () => props.setValue(0)}
                             component={Link}
                             to='/'
                         >

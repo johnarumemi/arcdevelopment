@@ -20,7 +20,7 @@ export const useStyles = makeStyles(theme => ({
             height: '6rem'
         },
         [theme.breakpoints.down('xs')]: { // <= xs
-            height: '4rem'
+            height: '4.65rem'
         }
     },
 
@@ -73,7 +73,11 @@ export const useStyles = makeStyles(theme => ({
 
     drawerIcon: {
         height: 50,
-        width: 50
+        width: 50,
+        [theme.breakpoints.down('xs')]: {
+            height: 40,
+            width: 40
+        }
     },
 
     drawer: {
