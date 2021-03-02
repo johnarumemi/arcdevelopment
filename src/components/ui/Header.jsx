@@ -113,7 +113,6 @@ const useStyles = makeStyles(theme => ({
     drawerIcon: {
         height: 50,
         width: 50
-
     },
 
     drawer: {
@@ -278,9 +277,9 @@ export default function Header (props){
                     paper: classes.menu
                 }}
             >{
-                menuOptions.map( (route, index) => (
+                menuOptions.map( route => (
                     <MenuItem
-                        key={index}
+                        key={`${route}${route.selectedIndex}`}
                         onClick={ e => handleMenuItemClick(e, route.selectedIndex) }
                         selected={ route.selectedIndex === selectedIndex && value === route.activeIndex} // receives selected styling
                         component={Link}
@@ -304,16 +303,14 @@ export default function Header (props){
                 open={openDrawer}
                 onClose={ () => setOpenDrawer(false) }
                 onOpen={ () => setOpenDrawer(true) }
-                classes={{
-                    paper: classes.drawer
-                }}
+                classes={{paper: classes.drawer}}
             >
                 <div className={classes.toolbarMargin} />
 
                 <List disablePadding> {/* Remove extra padding at top of Drawer */}
-                    {routes.map((route, index) => (
+                    {routes.map( route => (
                         <ListItem
-                            key={index}
+                            key={`${route}${route.activeIndex}`}
                             button
                             divider
                             component={Link}
