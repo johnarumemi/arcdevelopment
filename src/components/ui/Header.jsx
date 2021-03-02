@@ -10,6 +10,13 @@ import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
 import useMediaQuery from '@material-ui/core/useMediaQuery';
 import { useTheme } from "@material-ui/core/styles";
+import SwipeableDrawer from '@material-ui/core/SwipeableDrawer';
+import IconButton from '@material-ui/core/IconButton'; // Applies Button styling to just an Icon
+import MenuIcon from '@material-ui/icons/Menu';
+import List from '@material-ui/core/List';
+import ListItem from '@material-ui/core/ListItem';
+import ListItemText from '@material-ui/core/ListItemText';
+
 
 import { Link } from 'react-router-dom';
 import logo from '../../assets/logo.svg'
@@ -95,6 +102,44 @@ const useStyles = makeStyles(theme => ({
         "&:hover": {
             opacity: 1
         }
+    },
+
+    drawerIconContainer: {
+        marginLeft: 'auto',
+        '&:hover': {
+            backgroundColor: 'transparent'
+        }
+    },
+
+    drawerIcon: {
+        height: 50,
+        width: 50
+
+    },
+
+    drawer: {
+        background: theme.palette.common.blue,
+    },
+
+    drawerItem: {
+        ...theme.typography.tab,
+        color: 'white',
+        opacity: 0.7
+    },
+
+    drawerItemSelected: {
+        opacity: 1
+    },
+
+    drawerItemEstimate: {
+        backgroundColor: theme.palette.common.orange
+    },
+
+    customDivider: {
+        borderTop: "5px solid white",
+        borderRight: "5px solid white",
+        borderBottom: "5px solid white", //custom color
+        borderLeft: "5px solid white",
     }
 }))
 
@@ -117,25 +162,27 @@ export default function Header (props){
 
     const theme = useTheme();
 
+    const iOS = process.browser && /iPad|iPhone|iPod/.test(navigator.userAgent);
+
     const matches = useMediaQuery(theme.breakpoints.down('md')) // screen_width <= md ? true : false
 
+    const [openDrawer, setOpenDrawer] = useState(false);
     const [value, setValue] = useState(0);
-
     const [anchorEl, setAnchorEl] = useState(null);     // element that Menu is anchored to
-    const [open, setOpen] = useState(false);            // visibility of Menu
+    const [openMenu, setOpenMenu] = useState(false);            // visibility of Menu
     const [selectedIndex, setSelectedIndex] = useState(0); // selected Services Menu Options
     const [menuOptions, setMenuOptions] = useState(null)
 
     const handleClick = (event) => {
         // Open Menu
         setAnchorEl(event.currentTarget);
-        setOpen(true);
+        setOpenMenu(true);
     }
 
     const handleClose = (event) => {
         // Close Menu
         setAnchorEl(null);
-        setOpen(false);
+        setOpenMenu(false);
     }
 
     const handleChange = (event, newValue) => {
@@ -144,7 +191,7 @@ export default function Header (props){
 
     const handleMenuItemClick = (event, menuIndex) => {
         setAnchorEl(null);      // remove element Menu is anchored to
-        setOpen(false)          // close the Menu
+        setOpenMenu(false)      // close the Menu
         setValue(1)             // set Portfolio tab as been selected
         setSelectedIndex(menuIndex)  // store the index of the selected MenuItem
     }
@@ -177,7 +224,7 @@ export default function Header (props){
         const valid_menu_url = Object.keys(menu_urls.current).some( key => key === window.location.pathname)
         const desiredMenuIndex = menu_urls.current[window.location.pathname]
 
-        console.log(window.location.pathname, valid_url, valid_menu_url, desiredTabIndex ?? -1, value)
+        // console.log(window.location.pathname, valid_url, valid_menu_url, desiredTabIndex ?? -1, value)
 
         if (valid_url &&  value !== desiredTabIndex){
             setValue(desiredTabIndex)
@@ -243,7 +290,7 @@ export default function Header (props){
             <Menu
                 id='simple-menu'
                 anchorEl={anchorEl}
-                open={open}
+                open={openMenu}
                 onClose={handleClose}
                 MenuListProps={ {onMouseLeave: handleClose} }
                 elevation={0}
@@ -268,6 +315,107 @@ export default function Header (props){
             </Menu>
         </>
     )
+
+    const drawer = (
+        <>
+            <SwipeableDrawer
+                disableBackdropTransition={!iOS}
+                disableDiscovery={iOS}
+                anchor={'right'}
+                open={openDrawer}
+                onClose={ () => setOpenDrawer(false) }
+                onOpen={ () => setOpenDrawer(true) }
+                classes={{
+                    paper: classes.drawer
+                }}
+            >
+                <List disablePadding> {/* Remove extra padding at top of Drawer */}
+                    <ListItem
+                        className={
+                            value === 0
+                                ? `${classes.drawerItem} ${classes.drawerItemSelected}`
+                                : classes.drawerItem}
+                        onClick={ () => {setOpenDrawer(false);  setValue(0)} }
+                        selected={ value === 0}
+                        divider button
+                        component={Link} to='/'
+                    >
+                        <ListItemText disableTypography>
+                            Home
+                        </ListItemText>
+                    </ListItem>
+                    <ListItem
+                        className={
+                            value === 1
+                                ? `${classes.drawerItem} ${classes.drawerItemSelected}`
+                                : classes.drawerItem}
+                        onClick={ () => {setOpenDrawer(false);  setValue(1)} }
+                        selected={ value === 1}
+                        divider button
+                        component={Link} to='/services'
+                    >
+                        <ListItemText disableTypography>Services</ListItemText>
+                    </ListItem>
+                    <ListItem
+                        className={
+                            value === 2
+                                ? `${classes.drawerItem} ${classes.drawerItemSelected}`
+                                : classes.drawerItem}
+                        onClick={ () => {setOpenDrawer(false);  setValue(2)} }
+                        selected={ value === 2}
+                        divider button
+                        component={Link} to='/revolution'
+                    >
+                        <ListItemText disableTypography>The Revolution</ListItemText>
+                    </ListItem>
+                    <ListItem
+                        className={
+                            value === 3
+                                ? `${classes.drawerItem} ${classes.drawerItemSelected}`
+                                : classes.drawerItem}
+                        onClick={ () => {setOpenDrawer(false);  setValue(3)} }
+                        selected={ value === 3}
+                        divider button
+                        component={Link} to='/about'>
+                        <ListItemText disableTypography>About Us</ListItemText>
+                    </ListItem>
+                    <ListItem
+                        className={
+                            value === 4
+                                ? `${classes.drawerItem} ${classes.drawerItemSelected}`
+                                : classes.drawerItem}
+                        onClick={ () => {setOpenDrawer(false);  setValue(4)} }
+                        selected={ value === 4}
+                        divider button
+                        component={Link} to='/contact'
+                    >
+                        <ListItemText disableTypography component={'p'}>Contact Us</ListItemText>
+                    </ListItem>
+                    <ListItem
+                        className={
+                            value === 5
+                                ? `${classes.drawerItem} ${classes.drawerItemEstimate} ${classes.drawerItemSelected}`
+                                : `${classes.drawerItem} ${classes.drawerItemEstimate}`}
+                        onClick={ () => {setOpenDrawer(false);  setValue(5)} }
+                        selected={ value === 5 }
+                        divider button
+                        classes={ {divider: classes.customDivider }}
+                        component={Link} to='/estimate'
+                    >
+                        <ListItemText disableTypography>Free Estimate</ListItemText>
+                    </ListItem>
+                </List>
+            </SwipeableDrawer>
+
+            <IconButton
+                className={classes.drawerIconContainer}
+                onClick={() => setOpenDrawer(!openDrawer)}
+                disableRipple
+            >
+                <MenuIcon className={classes.drawerIcon}/>
+            </IconButton>
+        </>
+    );
     return (
         <>
             <ElevationScroll>
@@ -286,7 +434,7 @@ export default function Header (props){
                         </Button>
 
                         {/* if screen_width <= md render drawer else render full tabs*/}
-                        { matches ? null :  tabs }
+                        { matches ? drawer :  tabs }
 
                     </Toolbar>
                 </AppBar>
