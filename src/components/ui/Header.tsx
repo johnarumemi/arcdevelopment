@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, PropsWithChildren} from 'react';
 import useScrollTrigger from '@material-ui/core/useScrollTrigger';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
@@ -20,12 +20,17 @@ import { useStyles } from "./HeaderStyles";
 import { Link } from 'react-router-dom';
 import logo from '../../assets/logo.svg'
 
+
 // The app bar elevates on scroll to communicate that the user is not at the top of the page.
 // https://material-ui.com/components/app-bar/#scrolling
-function ElevationScroll(props) {
-    const { children } = props;
+interface PropsElevationScroll {
+    // need to do below to narrow the type of children passed into React.cloneElement
+    children: React.ReactElement;
+}
 
-    // useScrollTriggeer is a hook that is an event listener for when user is scrolling
+function ElevationScroll({children}: PropsWithChildren<PropsElevationScroll>){
+
+    // useScrollTrigger is a hook that is an event listener for when user is scrolling
     const trigger = useScrollTrigger({
         disableHysteresis: true,
         threshold: 0,
@@ -37,23 +42,38 @@ function ElevationScroll(props) {
     });
 }
 
+interface Props {
+    value: number | false; // can send false to tabs to make it deselect all tabs
+    selectedIndex: number;
+    setValue: (tabIndex: number | false) => void;
+    setSelectedIndex: (menuIndex: number) => void;
+}
 
 // Function Component
-export default function Header (props){
+export const Header: React.FC<Props> = (props) => {
 
     const classes = useStyles();
 
-    const iOS = process.browser && /iPad|iPhone|iPod/.test(navigator.userAgent);
+    const iOS = 'browser' in process && /iPad|iPhone|iPod/.test(navigator.userAgent);
 
     const theme = useTheme();
     const matches = useMediaQuery(theme.breakpoints.down('md')) // screen_width <= md ? true : false
 
-    const [openDrawer, setOpenDrawer] = useState(false);
-    const [anchorEl, setAnchorEl] = useState(null);     // element that Menu is anchored to
-    const [openMenu, setOpenMenu] = useState(false);            // visibility of Menu
+    const [openDrawer, setOpenDrawer] = useState<boolean>(false);
+    const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);     // element that Menu is anchored to
+    const [openMenu, setOpenMenu] = useState<boolean>(false);            // visibility of Menu
 
+    interface RouteOpts {
+        link: string;
+        name: string;
+        activeIndex: number;
+        ariaOwns?: string | undefined;
+        ariaPopup?: 'true' | 'false';
+        mouseOver?:  (event: React.MouseEvent<HTMLElement>) => void;
+        selectedIndex?: number | undefined;
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    const routes = [
+    const routes: RouteOpts[] = [
         {link: '/', name: 'Home'  , activeIndex: 0 },
         {
             link: '/services',
@@ -61,7 +81,7 @@ export default function Header (props){
             activeIndex: 1,
             ariaOwns: anchorEl ? "simple-menu" : undefined,
             ariaPopup: anchorEl ? "true" : "false",
-            mouseOver:  event => handleClick(event)
+            mouseOver:  (event: React.MouseEvent<HTMLElement>) => handleClick(event)
         },
         {link: '/revolution', name: 'The Revolution'  , activeIndex: 2  },
         {link: '/about', name: 'About Us'  , activeIndex: 3  },
@@ -72,11 +92,11 @@ export default function Header (props){
     const menuOptions = [
         {link: '/services', name: 'Services', activeIndex: 1, selectedIndex: 0},
         {link: '/customsoftware', name: 'Custom Software Development', activeIndex: 1, selectedIndex: 1 },
-        {link: '/mobileapps', name: 'Mobile App Development', activeIndex: 1, selectedIndex: 2 },
+        {link: '/mobileapps', name: 'iOS/Android App Development', activeIndex: 1, selectedIndex: 2 },
         {link: '/websites', name: 'Website Development', activeIndex: 1, selectedIndex: 3 },
     ]
 
-    const handleClick = (event) => {
+    const handleClick = (event: React.MouseEvent<HTMLElement>) => {
         // Open Menu
         setAnchorEl(event.currentTarget);
         setOpenMenu(true);
@@ -88,19 +108,21 @@ export default function Header (props){
         setOpenMenu(false);
     }
 
-    const handleChange = (event, newValue) => {
+    const handleChange = (event: React.ChangeEvent<{}>, newValue: number) => {
         props.setValue(newValue)
     }
 
-    const handleMenuItemClick = (event, menuIndex) => {
-        setAnchorEl(null);      // remove element Menu is anchored to
-        setOpenMenu(false)      // close the Menu
-        props.setValue(1)             // set Portfolio tab as been selected
-        props.setSelectedIndex(menuIndex)  // store the index of the selected MenuItem
+    const handleMenuItemClick = (menuIndex: number | undefined) => {
+        if (menuIndex !== undefined){
+            setAnchorEl(null);      // remove element Menu is anchored to
+            setOpenMenu(false)      // close the Menu
+            props.setValue(1)             // set Portfolio tab as been selected
+            props.setSelectedIndex(menuIndex)  // store the index of the selected MenuItem
+        }
     }
 
     useEffect( () => {
-        [...menuOptions, ...routes].forEach( route => {
+        [...menuOptions, ...routes].forEach( ( (route: RouteOpts) => {
             // For each route we check if route.link is current path
             if (route.link === window.location.pathname){
                 // if we are in current path ensure that value is set to correct active tab
@@ -113,7 +135,7 @@ export default function Header (props){
                     }
                 }
             }
-        })
+        }))
     }, [props.value, props.selectedIndex, menuOptions, routes, props])
 
     const tabs = (
@@ -164,10 +186,10 @@ export default function Header (props){
                     paper: classes.menu
                 }}
             >{
-                menuOptions.map( route => (
+                menuOptions.map( (route: RouteOpts) => (
                     <MenuItem
                         key={`${route}${route.selectedIndex}`}
-                        onClick={ e => handleMenuItemClick(e, route.selectedIndex) }
+                        onClick={ () => handleMenuItemClick(route.selectedIndex) }
                         selected={ route.selectedIndex === props.selectedIndex && props.value === route.activeIndex} // receives selected styling
                         component={Link}
                         to={route.link}
@@ -272,3 +294,5 @@ export default function Header (props){
         </>
     )
 }
+
+export default Header;

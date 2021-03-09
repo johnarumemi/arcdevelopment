@@ -5,7 +5,7 @@ ADD public/ /app/public
 ADD src/   /app/src
 ADD package.json package-lock.json /app/
 WORKDIR /app
-RUN npm install
+RUN npm install --force
 RUN npm run build
 
 FROM nginx:latest
@@ -16,4 +16,4 @@ RUN mkdir -p /var/www/html
 COPY --from=source /app/build/ /var/www/html/
 ADD /nginx/*.conf /etc/nginx/conf.d/
 WORKDIR /var/www/html
-EXPOSE 80 443
+EXPOSE 80

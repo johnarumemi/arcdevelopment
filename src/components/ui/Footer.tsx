@@ -1,5 +1,4 @@
-import React from 'react';
-import {makeStyles} from "@material-ui/core/styles";
+import React, {PropsWithChildren} from 'react';
 import Grid from '@material-ui/core/Grid';
 import Hidden from '@material-ui/core/Hidden';
 
@@ -10,62 +9,16 @@ import facebook from '../../assets/facebook.svg';
 import twitter from '../../assets/twitter.svg';
 import instagram from '../../assets/instagram.svg';
 
-const useStyles = makeStyles( theme => ({
+import {useStyles} from "./FooterStyles";
 
-    footer: {
-        backgroundColor: theme.palette.common.blue,
-        width: '100%',
-        zIndex: theme.zIndex.modal + 1,
-        position: 'fixed',
-        bottom: "0px"
-    },
+interface Props {
+    value: number | false; // can send false to tabs to make it deselect all tabs
+    selectedIndex: number;
+    setValue: (tabIndex: number | false) => void;
+    setSelectedIndex: (menuIndex: number) => void;
+}
 
-    adornment: {
-        width: '25rem',
-        verticalAlign: "bottom", // change where on image it is anchored to screen
-        [theme.breakpoints.down('md')]: {
-            width: '21rem'
-        },
-        [theme.breakpoints.down('xs')]: {
-            width: '15rem'
-        }
-    },
-
-    mainContainer: {
-        position: "absolute",
-    },
-
-    link: {
-        color: "white",
-        fontFamily: "Arial",
-        fontSize: "0.75rem",
-        fontFace: 'bold',
-        textDecoration: 'none'
-    },
-    gridItem: {
-        margin: "3rem"
-    },
-
-    icon: {
-        height: '4rem',
-        width: '4rem',
-        [theme.breakpoints.down('xs')]: {
-            height: '2.5rem',
-            width:  '2.5rem'
-        }
-    },
-    socialContainer: {
-        position: 'absolute',
-        bottom: '1rem',
-        right: '1.5rem',
-        [theme.breakpoints.down('xs')]: {
-            right: '0.6rem',
-        }
-    }
-}));
-
-
-export default function Footer(props){
+export default function Footer(props: PropsWithChildren<Props>){
 
     const classes = useStyles()
     const spacing = 2;
@@ -79,7 +32,7 @@ export default function Footer(props){
                 className={classes.mainContainer}
                 justify='center'
                 alignContent='center'
-                spacing={spacing}
+                // spacing={spacing}  // introduces negative margins and hence horizontal scroll bar
             >
                 <Grid item className={classes.gridItem}>
                     <Grid container direction='column'spacing={spacing}>
@@ -98,7 +51,7 @@ export default function Footer(props){
                             Custom Software Development
                         </Grid>
                         <Grid item className={classes.link} onClick={() => { props.setValue(1) ; props.setSelectedIndex(2) }} component={Link} to='/mobileapps'>
-                            Mobile App Development
+                            iOS/Android App Development
                         </Grid>
                         <Grid item className={classes.link} onClick={() => { props.setValue(1) ; props.setSelectedIndex(3) }} component={Link} to='/websites'>
                             Website Development

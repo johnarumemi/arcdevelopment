@@ -1,6 +1,8 @@
-import {makeStyles} from "@material-ui/core/styles";
+import {createStyles, makeStyles} from "@material-ui/core/styles";
 
-export const useStyles = makeStyles(theme => ({
+export const useStyles = makeStyles(theme => (
+
+    createStyles({
     // class name
     toolbarMargin: {
         boxSizing: "content-box",
@@ -47,6 +49,9 @@ export const useStyles = makeStyles(theme => ({
         marginRight: 25,
         borderRadius: "50px",
         height: '45px',
+        "&:hover":{
+            backgroundColor: theme.palette.secondary.light
+        }
     },
 
     menu: {
@@ -110,4 +115,4 @@ export const useStyles = makeStyles(theme => ({
     appbar: {
         zIndex: theme.zIndex.modal + 1 // zIndex of modal unit, which is used underneath the Drawer Component
     }
-}))
+})));
